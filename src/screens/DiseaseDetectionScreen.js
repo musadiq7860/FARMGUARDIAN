@@ -14,6 +14,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { COLORS, CROP_LIST } from '../utils/constants';
 import { detectDisease } from '../services/diseaseService';
 import { releaseModel } from '../services/tfliteService';
+import diseaseSprayData from '../data/diseaseSprayData.json';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import CropSelector from '../components/CropSelector';
@@ -168,6 +169,42 @@ const DiseaseDetectionScreen = ({ navigation }) => {
             </View>
           </View>
         </Card>
+
+        {result.result.status !== 'healthy' && (() => {
+          const sprayInfo = diseaseSprayData[result.cropType]?.[result.result.diseaseName];
+          if (!sprayInfo) return null;
+          const isNoSpray = sprayInfo.amountPerAcreUr === '—';
+          return (
+            <Card title="علاج">
+              <View style={styles.sprayRow}>
+                <Text style={styles.sprayLabel}>دوائی:</Text>
+                <Text style={styles.sprayValue}>{sprayInfo.sprayNameUr}</Text>
+              </View>
+              {!isNoSpray && (
+                <View style={styles.sprayRow}>
+                  <Text style={styles.sprayLabel}>مقدار:</Text>
+                  <Text style={styles.sprayValue}>{sprayInfo.amountPerAcreUr}</Text>
+                </View>
+              )}
+              <View style={styles.sprayRow}>
+                <Text style={styles.sprayLabel}>وقت:</Text>
+                <Text style={styles.sprayValue}>{sprayInfo.timingUr}</Text>
+              </View>
+              <View style={styles.sprayRow}>
+                <Text style={styles.sprayLabel}>تعدد:</Text>
+                <Text style={styles.sprayValue}>{sprayInfo.frequencyUr}</Text>
+              </View>
+              <View style={styles.sprayCaution}>
+                <Text style={styles.sprayCautionText}>{sprayInfo.cautionUr}</Text>
+              </View>
+              {sprayInfo.altSprayUr && sprayInfo.altSprayUr !== '—' && (
+                <View style={styles.sprayAlt}>
+                  <Text style={styles.sprayAltText}>{sprayInfo.altSprayUr}</Text>
+                </View>
+              )}
+            </Card>
+          );
+        })()}
 
         <Button
           title={t('disease.scanAnother')}
@@ -377,6 +414,50 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.text,
     lineHeight: 20,
+  },
+  sprayRow: {
+    flexDirection: 'row',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    alignItems: 'flex-start',
+  },
+  sprayLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    width: 55,
+  },
+  sprayValue: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    textAlign: 'right',
+  },
+  sprayCaution: {
+    marginTop: 12,
+    backgroundColor: '#FFF8E1',
+    borderRadius: 8,
+    padding: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FFC107',
+  },
+  sprayCautionText: {
+    fontSize: 13,
+    color: '#E65100',
+    lineHeight: 20,
+    textAlign: 'right',
+  },
+  sprayAlt: {
+    marginTop: 8,
+    backgroundColor: COLORS.background,
+    borderRadius: 8,
+    padding: 10,
+  },
+  sprayAltText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    textAlign: 'right',
   },
 });
 

@@ -30,7 +30,6 @@ const AppNavigator = () => {
   // Determine the initial route based on auth + profile state
   const getInitialRoute = () => {
     if (!token && !isGuest) return 'Welcome';
-    if (token && !isProfileComplete && !isGuest) return 'ProfileSetup';
     return 'MainApp';
   };
   
