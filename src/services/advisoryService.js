@@ -1,7 +1,32 @@
 import api from '../utils/api';
 import { API_ENDPOINTS } from '../utils/constants';
+import cropAdvisoryData from '../data/cropAdvisoryData.json';
 
 const MOCK_MODE = true;
+
+// ─── JSON-driven helpers ───────────────────────────────────────────────────────
+
+/**
+ * Returns water schedule + fertilizer checklist for a specific crop + soil type.
+ * Used by Smart Mashwara (Mode 1).
+ */
+export const getSmartAdvisory = (cropType, soilColor) => {
+  const cropData = cropAdvisoryData.smartMashwara[cropType];
+  if (!cropData) return null;
+  const fallbackSoil = 'light_brown';
+  return {
+    waterSchedule: cropData.waterSchedule[soilColor] || cropData.waterSchedule[fallbackSoil],
+    fertilizerSchedule: cropData.fertilizerSchedule,
+  };
+};
+
+/**
+ * Returns the full week-by-week crop calendar for a crop.
+ * Used by Crop Plan (Mode 2).
+ */
+export const getCropCalendar = (cropType) => {
+  return cropAdvisoryData.cropCalendar[cropType] || null;
+};
 
 const MOCK_IRRIGATION_SCHEDULE = {
   sowing: {
