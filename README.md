@@ -189,7 +189,7 @@ The app automatically switches to RTL layout when Urdu is selected. No manual co
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License.....
 
 ## 👥 Team
 
