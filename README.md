@@ -193,7 +193,10 @@ This project is licensed under the MIT License.
 
 ## 👥 Team
 
-Developed for FarmGuardian - FYP Project
+Musadiq Qaysir @musadiq7860
+Faraz Shoukat @farazshoukat
+Abdullah Arshad @AbdullahArshad21
+
 
 ## 📞 Support
 
