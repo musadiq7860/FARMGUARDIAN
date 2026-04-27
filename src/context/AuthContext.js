@@ -12,6 +12,22 @@ import { supabase } from '../config/supabase';
 
 const AuthContext = createContext();
 
+const normalizeUserData = (data = {}) => ({
+  ...data,
+  uid: data.uid || data.id || null,
+  id: data.id || data.uid || null,
+  name: data.name || data.displayName || data.full_name || null,
+  displayName: data.displayName || data.name || data.full_name || null,
+  phoneNumber: data.phoneNumber || data.phone_number || null,
+  totalLand: data.totalLand ?? data.total_land ?? null,
+  cropsGrown: data.cropsGrown || data.crops_grown || [],
+  photoURL: data.photoURL || data.photo_url || null,
+  is_profile_complete:
+    data.is_profile_complete ?? data.isProfileComplete ?? false,
+  isProfileComplete:
+    data.isProfileComplete ?? data.is_profile_complete ?? false,
+});
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -33,7 +49,7 @@ export const AuthProvider = ({ children }) => {
     
     // Listen to Supabase auth state changes
     const unsubscribe = onAuthStateChanged(async (supaUser, session) => {
-      if (supaUser && session && !isGuest) {
+      if (supaUser && session) {
         try {
           // Fetch latest profile from Supabase
           const { data: profile } = await supabase
@@ -42,7 +58,7 @@ export const AuthProvider = ({ children }) => {
             .eq('id', supaUser.id)
             .single();
 
-          const userData = profile
+          const rawUserData = profile
             ? {
                 uid: supaUser.id,
                 email: supaUser.email,
@@ -57,12 +73,15 @@ export const AuthProvider = ({ children }) => {
                 photoURL: supaUser.user_metadata?.avatar_url || null,
               };
 
+          const userData = normalizeUserData(rawUserData);
+
           const token = session.access_token;
           await saveUserToken(token);
           await saveUserData(userData);
           setToken(token);
           setUser(userData);
-          setIsProfileComplete(profile?.is_profile_complete || false);
+          setIsProfileComplete(userData.is_profile_complete || false);
+          setIsGuest(false);
         } catch (error) {
           console.error('Error syncing user data:', error);
         }
@@ -82,9 +101,11 @@ export const AuthProvider = ({ children }) => {
       const savedUser = await getUserData();
       
       if (savedToken && savedUser) {
+        const normalizedUser = normalizeUserData(savedUser);
         setToken(savedToken);
-        setUser(savedUser);
-        setIsProfileComplete(savedUser?.is_profile_complete || false);
+        setUser(normalizedUser);
+        setIsProfileComplete(normalizedUser?.is_profile_complete || false);
+        setIsGuest(false);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -95,10 +116,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userData, authToken) => {
     try {
+      const normalizedUser = normalizeUserData(userData);
       await saveUserToken(authToken);
-      await saveUserData(userData);
+      await saveUserData(normalizedUser);
       setToken(authToken);
-      setUser(userData);
+      setUser(normalizedUser);
+      setIsProfileComplete(normalizedUser?.is_profile_complete || false);
       setIsGuest(false);
       return true;
     } catch (error) {
@@ -109,11 +132,12 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData, authToken) => {
     try {
+      const normalizedUser = normalizeUserData(userData);
       await saveUserToken(authToken);
-      await saveUserData(userData);
+      await saveUserData(normalizedUser);
       setToken(authToken);
-      setUser(userData);
-      setIsProfileComplete(userData?.isProfileComplete || userData?.is_profile_complete || false);
+      setUser(normalizedUser);
+      setIsProfileComplete(normalizedUser?.is_profile_complete || false);
       setIsGuest(false);
       return true;
     } catch (error) {
@@ -123,8 +147,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginAsGuest = () => {
+    removeData(STORAGE_KEYS.USER_TOKEN);
+    removeData(STORAGE_KEYS.USER_DATA);
     setIsGuest(true);
-    setUser({ name: 'Guest', isGuest: true });
+    setToken(null);
+    setIsProfileComplete(false);
+    setUser({ name: 'Guest', isGuest: true, is_profile_complete: true });
     return true;
   };
 
@@ -150,9 +178,10 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = async (updatedData) => {
     try {
-      const newUserData = { ...user, ...updatedData };
+      const newUserData = normalizeUserData({ ...user, ...updatedData });
       await saveUserData(newUserData);
       setUser(newUserData);
+      setIsProfileComplete(newUserData?.is_profile_complete || false);
       return true;
     } catch (error) {
       console.error('Error updating user:', error);

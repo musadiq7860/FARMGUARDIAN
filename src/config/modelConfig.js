@@ -197,3 +197,27 @@ export const RECOMMENDATIONS = {
     'استعمال کے بعد اوزار جراثیم سے پاک کریں',
   ],
 };
+
+export const RECOMMENDATIONS_EN = {
+  healthy: [
+    'Continue regular monitoring of the crop',
+    'Maintain proper irrigation schedule',
+    'Apply preventive fungicide spray',
+    'Remove any affected leaves immediately',
+  ],
+  warning: [
+    'Keep a close eye on the affected area',
+    'Apply recommended fungicide treatment',
+    'Improve air circulation between plants',
+    'Avoid overhead watering',
+    'Carefully remove affected leaves',
+  ],
+  diseased: [
+    'Isolate affected plants immediately',
+    'Apply specific fungicide or pesticide',
+    'Remove and destroy severely affected plants',
+    'Consult an agricultural expert if spread continues',
+    'Do not use affected material for composting',
+    'Sanitize tools after use',
+  ],
+};

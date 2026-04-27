@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +11,7 @@ import { COLORS, CROP_LIST } from '../utils/constants';
 import { getDiseaseHistory, getYieldHistory } from '../utils/storage';
 import Card from '../components/Card';
 import HealthStatusBadge from '../components/HealthStatusBadge';
+import BrandLogo from '../components/BrandLogo';
 import { formatDate } from '../utils/helpers';
 
 const HomeScreen = ({ navigation }) => {
@@ -78,10 +78,16 @@ const HomeScreen = ({ navigation }) => {
   ];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <View style={styles.container}>
+    <View style={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>{t('home.greeting')}</Text>
-        <Text style={styles.userName}>{user?.name || 'کسان'}</Text>
+        <View>
+          <Text style={styles.greeting}>{t('home.greeting')}</Text>
+          <Text style={styles.userName}>{user?.name || user?.displayName || t('home.defaultFarmerName')}</Text>
+        </View>
+        <View style={styles.headerLogoWrap}>
+          <BrandLogo variant="shield" size="small" style={styles.headerLogo} />
+        </View>
       </View>
 
       <View style={styles.quickActionsContainer}>
@@ -105,9 +111,7 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{t('home.recentActivity')}</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Reports')}>
-            <Text style={styles.seeAll}>
-              {currentLanguage === 'ur' ? 'سب دیکھیں →' : 'See All →'}
-            </Text>
+            <Text style={styles.seeAll}>{t('common.seeAllArrow')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -121,7 +125,7 @@ const HomeScreen = ({ navigation }) => {
               {item.type === 'disease' ? (
                 <View>
                   <View style={styles.activityHeader}>
-                    <Text style={styles.activityType}>🔬 بیماری کی تشخیص</Text>
+                    <Text style={styles.activityType}>🔬 {t('home.activityDisease')}</Text>
                     <Text style={styles.activityDate}>
                       {formatDate(item.detectionDate)}
                     </Text>
@@ -132,14 +136,14 @@ const HomeScreen = ({ navigation }) => {
               ) : (
                 <View>
                   <View style={styles.activityHeader}>
-                    <Text style={styles.activityType}>📊 پیداوار کی پیشن گوئی</Text>
+                    <Text style={styles.activityType}>📊 {t('home.activityYield')}</Text>
                     <Text style={styles.activityDate}>
                       {formatDate(item.predictionDate)}
                     </Text>
                   </View>
                   <Text style={styles.activityCrop}>{getCropName(item.cropType)}</Text>
                   <Text style={styles.yieldText}>
-                    {item.predictedYield} {item.unit} فی ایکڑ
+                    {item.predictedYield} {item.unit} {t('yield.perAcre')}
                   </Text>
                 </View>
               )}
@@ -147,7 +151,8 @@ const HomeScreen = ({ navigation }) => {
           ))
         )}
       </View>
-    </ScrollView>
+    </View>
+    </View>
   );
 };
 
@@ -161,6 +166,22 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerLogoWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerLogo: {
+    marginBottom: 0,
   },
   greeting: {
     fontSize: 20,

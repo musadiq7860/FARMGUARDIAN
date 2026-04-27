@@ -88,9 +88,14 @@ const ProfileSetupScreen = ({ route, navigation }) => {
       
       // Get UID from userData prop or from current Supabase session
       let uid = userData?.uid || userData?.id;
+      let accessToken = token;
       if (!uid) {
         const { data: { user: supaUser } } = await supabase.auth.getUser();
         uid = supaUser?.id;
+      }
+      if (!accessToken) {
+        const { data: { session } } = await supabase.auth.getSession();
+        accessToken = session?.access_token || null;
       }
 
       const profileData = {
@@ -109,7 +114,7 @@ const ProfileSetupScreen = ({ route, navigation }) => {
       const result = await updateUserProfile(uid, profileData);
       
       if (result.success) {
-        await register(result.user, token);
+        await register(result.user, accessToken);
         Alert.alert(
           t('common.success'),
           t('auth.profileCompleted'),

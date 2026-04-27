@@ -20,12 +20,15 @@ export const signUpWithEmail = async (email, password) => {
   return {
     success: true,
     needsConfirmation,
+    token: data.session?.access_token || null,
     user: data.user
       ? {
           uid: data.user.id,
           email: data.user.email,
+          name: data.user.user_metadata?.full_name || null,
           displayName: data.user.user_metadata?.full_name || null,
           photoURL: data.user.user_metadata?.avatar_url || null,
+          is_profile_complete: false,
         }
       : null,
   };
@@ -58,9 +61,11 @@ export const signInWithEmail = async (email, password) => {
     user: {
       uid: supaUser.id,
       email: supaUser.email,
+      name: profile?.name || supaUser.user_metadata?.full_name || null,
       displayName: profile?.name || supaUser.user_metadata?.full_name || null,
       photoURL: profile?.photo_url || supaUser.user_metadata?.avatar_url || null,
       ...profile,
+      is_profile_complete: profile?.is_profile_complete || false,
     },
     token: session.access_token,
     isNewUser: !profile?.is_profile_complete,
@@ -104,6 +109,7 @@ export const updateUserProfile = async (uid, profileData) => {
     user: {
       uid: data.id,
       email: data.email,
+      name: data.name,
       displayName: data.name,
       phoneNumber: data.phone_number,
       city: data.city,
@@ -112,6 +118,7 @@ export const updateUserProfile = async (uid, profileData) => {
       totalLand: data.total_land,
       cropsGrown: data.crops_grown,
       photoURL: data.photo_url,
+      is_profile_complete: data.is_profile_complete,
       isProfileComplete: data.is_profile_complete,
     },
   };

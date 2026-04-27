@@ -19,8 +19,8 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleLogout = () => {
     Alert.alert(
-      'لاگ آؤٹ',
-      'کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟',
+      t('common.logout'),
+      t('profile.logoutConfirm'),
       [
         { text: t('common.cancel'), style: 'cancel' },
         {
@@ -40,10 +40,10 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.header}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>
-            {user?.name ? user.name.charAt(0).toUpperCase() : '👤'}
+            {(user?.name || user?.displayName || 'G').charAt(0).toUpperCase()}
           </Text>
         </View>
-        <Text style={styles.name}>{user?.name || 'Guest'}</Text>
+        <Text style={styles.name}>{user?.name || user?.displayName || t('profile.guestName')}</Text>
         {user?.phoneNumber && (
           <Text style={styles.phone}>{user.phoneNumber}</Text>
         )}
@@ -52,16 +52,16 @@ const ProfileScreen = ({ navigation }) => {
       {user && !user.isGuest && (
         <Card>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>ضلع:</Text>
-            <Text style={styles.infoValue}>{user.district || 'N/A'}</Text>
+            <Text style={styles.infoLabel}>{t('auth.district')}:</Text>
+            <Text style={styles.infoValue}>{user.district || t('common.notAvailable')}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>گاؤں:</Text>
-            <Text style={styles.infoValue}>{user.village || 'N/A'}</Text>
+            <Text style={styles.infoLabel}>{t('auth.village')}:</Text>
+            <Text style={styles.infoValue}>{user.village || t('common.notAvailable')}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>کھیت کا رقبہ:</Text>
-            <Text style={styles.infoValue}>{user.farmSize || 0} ایکڑ</Text>
+            <Text style={styles.infoLabel}>{t('auth.totalLand')}:</Text>
+            <Text style={styles.infoValue}>{user.totalLand || 0} {t('profile.acresUnit')}</Text>
           </View>
         </Card>
       )}
@@ -78,12 +78,12 @@ const ProfileScreen = ({ navigation }) => {
 
         <TouchableOpacity style={styles.settingItem}>
           <Text style={styles.settingText}>{t('profile.notifications')}</Text>
-          <Text style={styles.settingValue}>آن</Text>
+          <Text style={styles.settingValue}>{t('profile.onLabel')}</Text>
         </TouchableOpacity>
       </Card>
 
       <Card>
-        <Text style={styles.sectionTitle}>دیگر</Text>
+        <Text style={styles.sectionTitle}>{t('profile.other')}</Text>
         
         <TouchableOpacity style={styles.settingItem}>
           <Text style={styles.settingText}>{t('profile.help')}</Text>
@@ -112,7 +112,7 @@ const ProfileScreen = ({ navigation }) => {
 
       {user?.isGuest && (
         <Button
-          title="رجسٹر کریں"
+          title={t('auth.signUp')}
           onPress={() => navigation.navigate('Welcome')}
           style={styles.logoutButton}
         />
@@ -134,18 +134,18 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 116,
+    height: 116,
+    borderRadius: 58,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
   avatarText: {
-    fontSize: 40,
-    color: '#FFFFFF',
+    fontSize: 48,
     fontWeight: '700',
+    color: '#FFFFFF',
   },
   name: {
     fontSize: 24,

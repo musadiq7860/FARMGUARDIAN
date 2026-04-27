@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import { useLanguage } from '../context/LanguageContext';
 import { COLORS } from '../utils/constants';
 import { adminLogin } from '../services/authService';
 import { getFarmers, getAdminStats } from '../services/adminService';
@@ -16,6 +17,7 @@ import Card from '../components/Card';
 import Loader from '../components/Loader';
 
 const AdminScreen = ({ navigation }) => {
+  const { t, currentLanguage } = useLanguage();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -51,19 +53,19 @@ const AdminScreen = ({ navigation }) => {
       setLoading(true);
       await adminLogin(username, password);
       setIsLoggedIn(true);
-      Alert.alert('کامیابی', 'ایڈمن لاگ ان کامیاب');
+      Alert.alert(t('common.success'), t('admin.loginSuccess'));
     } catch (error) {
-      Alert.alert('خرابی', error.message || 'غلط اسناد');
+      Alert.alert(t('common.error'), error.message || t('admin.invalidCredentials'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleLogout = () => {
-    Alert.alert('لاگ آؤٹ', 'کیا آپ لاگ آؤٹ کرنا چاہتے ہیں؟', [
-      { text: 'منسوخ', style: 'cancel' },
+    Alert.alert(t('common.logout'), t('profile.logoutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'ہاں',
+        text: t('common.ok'),
         onPress: () => {
           setIsLoggedIn(false);
           setUsername('');
@@ -79,26 +81,26 @@ const AdminScreen = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.loginContent}>
           <View style={styles.loginHeader}>
             <Text style={styles.loginIcon}>🔐</Text>
-            <Text style={styles.loginTitle}>ایڈمن لاگ ان</Text>
+            <Text style={styles.loginTitle}>{t('admin.loginTitle')}</Text>
           </View>
 
           <Card>
             <Input
-              label="صارف نام"
+              label={t('admin.username')}
               value={username}
               onChangeText={setUsername}
               placeholder="admin"
               autoCapitalize="none"
             />
             <Input
-              label="پاس ورڈ"
+              label={t('auth.password')}
               value={password}
               onChangeText={setPassword}
               placeholder="••••••"
               secureTextEntry
             />
             <Button
-              title="لاگ ان"
+              title={t('auth.login')}
               onPress={handleLogin}
               loading={loading}
               style={styles.button}
@@ -116,9 +118,9 @@ const AdminScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>ایڈمن پینل</Text>
+        <Text style={styles.headerTitle}>{t('admin.title')}</Text>
         <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.logoutText}>لاگ آؤٹ</Text>
+          <Text style={styles.logoutText}>{t('common.logout')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -128,7 +130,7 @@ const AdminScreen = ({ navigation }) => {
           onPress={() => setActiveTab('dashboard')}
         >
           <Text style={[styles.tabText, activeTab === 'dashboard' && styles.activeTabText]}>
-            ڈیش بورڈ
+            {t('admin.dashboard')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -136,7 +138,7 @@ const AdminScreen = ({ navigation }) => {
           onPress={() => setActiveTab('farmers')}
         >
           <Text style={[styles.tabText, activeTab === 'farmers' && styles.activeTabText]}>
-            کسان
+            {t('admin.farmers')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -147,35 +149,35 @@ const AdminScreen = ({ navigation }) => {
             <View style={styles.statsGrid}>
               <Card style={styles.statCard}>
                 <Text style={styles.statValue}>{stats.totalFarmers}</Text>
-                <Text style={styles.statLabel}>کل کسان</Text>
+                <Text style={styles.statLabel}>{t('admin.totalFarmers')}</Text>
               </Card>
               <Card style={styles.statCard}>
                 <Text style={styles.statValue}>{stats.totalDetections}</Text>
-                <Text style={styles.statLabel}>تشخیصات</Text>
+                <Text style={styles.statLabel}>{t('admin.totalDetections')}</Text>
               </Card>
               <Card style={styles.statCard}>
                 <Text style={styles.statValue}>{stats.totalPredictions}</Text>
-                <Text style={styles.statLabel}>پیشن گوئیاں</Text>
+                <Text style={styles.statLabel}>{t('admin.totalPredictions')}</Text>
               </Card>
               <Card style={styles.statCard}>
                 <Text style={styles.statValue}>{stats.activeUsers}</Text>
-                <Text style={styles.statLabel}>فعال صارفین</Text>
+                <Text style={styles.statLabel}>{t('admin.activeUsers')}</Text>
               </Card>
             </View>
 
-            <Card title="بیماری کی تقسیم">
+            <Card title={t('admin.diseaseDistribution')}>
               <View style={styles.chartRow}>
                 <View style={styles.chartLabel}>
                   <View style={[styles.chartDot, { backgroundColor: COLORS.healthy }]} />
-                  <Text>صحت مند: {stats.diseasesByType.healthy}</Text>
+                  <Text>{t('disease.healthy')}: {stats.diseasesByType.healthy}</Text>
                 </View>
                 <View style={styles.chartLabel}>
                   <View style={[styles.chartDot, { backgroundColor: COLORS.warning }]} />
-                  <Text>انتباہ: {stats.diseasesByType.warning}</Text>
+                  <Text>{t('disease.warning')}: {stats.diseasesByType.warning}</Text>
                 </View>
                 <View style={styles.chartLabel}>
                   <View style={[styles.chartDot, { backgroundColor: COLORS.diseased }]} />
-                  <Text>بیمار: {stats.diseasesByType.diseased}</Text>
+                  <Text>{t('disease.diseased')}: {stats.diseasesByType.diseased}</Text>
                 </View>
               </View>
             </Card>
@@ -189,9 +191,9 @@ const AdminScreen = ({ navigation }) => {
                 <Text style={styles.farmerName}>{farmer.name}</Text>
                 <Text style={styles.farmerInfo}>📱 {farmer.phoneNumber}</Text>
                 <Text style={styles.farmerInfo}>📍 {farmer.district}, {farmer.village}</Text>
-                <Text style={styles.farmerInfo}>🌾 {farmer.farmSize} ایکڑ</Text>
+                <Text style={styles.farmerInfo}>🌾 {farmer.farmSize} {t('profile.acresUnit')}</Text>
                 <Text style={styles.farmerInfo}>
-                  شامل ہوئے: {new Date(farmer.joinedDate).toLocaleDateString('ur-PK')}
+                  {t('admin.joinedLabel')}: {new Date(farmer.joinedDate).toLocaleDateString(currentLanguage === 'ur' ? 'ur-PK' : 'en-US')}
                 </Text>
               </Card>
             ))}

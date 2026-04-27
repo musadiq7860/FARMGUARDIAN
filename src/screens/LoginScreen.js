@@ -13,11 +13,12 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { COLORS } from '../utils/constants';
 import { signInWithEmail } from '../services/authService';
+import BrandLogo from '../components/BrandLogo';
 import Button from '../components/Button';
 import Input from '../components/Input';
 
 const LoginScreen = ({ navigation }) => {
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
   const { t } = useLanguage();
   
   const [email, setEmail] = useState('');
@@ -54,7 +55,14 @@ const LoginScreen = ({ navigation }) => {
       
       if (result.success) {
         await login(result.user, result.token);
-        navigation.replace('MainApp');
+        if (result.isNewUser) {
+          navigation.replace('ProfileSetup', {
+            userData: result.user,
+            token: result.token,
+          });
+        } else {
+          navigation.replace('MainApp');
+        }
       }
     } catch (error) {
       Alert.alert(
@@ -83,7 +91,7 @@ const LoginScreen = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.logo}>🌾</Text>
+          <BrandLogo variant="full" size="large" style={{ marginBottom: 16 }} />
           <Text style={styles.title}>{t('auth.welcomeBack')}</Text>
           <Text style={styles.subtitle}>{t('auth.loginToContinue')}</Text>
         </View>
@@ -146,7 +154,7 @@ const LoginScreen = ({ navigation }) => {
         <TouchableOpacity 
           style={styles.guestButton}
           onPress={() => {
-            login({ isGuest: true }, null);
+            loginAsGuest();
             navigation.replace('MainApp');
           }}
         >
@@ -170,10 +178,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 40,
     marginBottom: 32,
-  },
-  logo: {
-    fontSize: 60,
-    marginBottom: 16,
   },
   title: {
     fontSize: 28,

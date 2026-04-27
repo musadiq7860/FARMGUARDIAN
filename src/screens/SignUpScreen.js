@@ -9,15 +9,14 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { COLORS } from '../utils/constants';
 import { signUpWithEmail } from '../services/authService';
+import BrandLogo from '../components/BrandLogo';
 import Button from '../components/Button';
 import Input from '../components/Input';
 
 const SignUpScreen = ({ navigation }) => {
-  const { register } = useAuth();
   const { t } = useLanguage();
   
   const [email, setEmail] = useState('');
@@ -66,7 +65,7 @@ const SignUpScreen = ({ navigation }) => {
           // Auto-confirmed (e.g. test env) – go to profile setup
           navigation.navigate('ProfileSetup', {
             userData: result.user,
-            token: null,
+            token: result.token,
           });
         }
       }
@@ -97,7 +96,7 @@ const SignUpScreen = ({ navigation }) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.logo}>🌾</Text>
+          <BrandLogo variant="full" size="large" style={{ marginBottom: 16 }} />
           <Text style={styles.title}>{t('auth.createAccount')}</Text>
           <Text style={styles.subtitle}>{t('auth.joinFarmGuardian')}</Text>
         </View>
@@ -107,9 +106,9 @@ const SignUpScreen = ({ navigation }) => {
           <View style={styles.confirmationBanner}>
             <Text style={styles.confirmationIcon}>📧</Text>
             <View style={styles.confirmationTextContainer}>
-              <Text style={styles.confirmationTitle}>Check your email!</Text>
+              <Text style={styles.confirmationTitle}>{t('auth.checkEmailTitle')}</Text>
               <Text style={styles.confirmationSubtitle}>
-                We sent a confirmation link to {email}. Please confirm your email then sign in.
+                {t('auth.checkEmailBody', { email })}
               </Text>
             </View>
           </View>
@@ -201,10 +200,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 40,
     marginBottom: 32,
-  },
-  logo: {
-    fontSize: 60,
-    marginBottom: 16,
   },
   title: {
     fontSize: 28,

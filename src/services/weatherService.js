@@ -1,4 +1,4 @@
-const OPENWEATHER_API_KEY = '';
+const OPENWEATHER_API_KEY = 'e0cb2cb35fa34d3f2cf317599343f978';
 const OPENWEATHER_FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
 
 // Punjab district coordinates — no GPS needed
@@ -43,7 +43,8 @@ export const getWeatherForecast = async (districtId = 'lahore') => {
   const coords = DISTRICT_COORDS[districtId] || DISTRICT_COORDS.lahore;
 
   if (!OPENWEATHER_API_KEY) {
-    throw new Error('Weather API key configured نہیں ہے');
+    // Return mock weather so the Advisory screen works without an API key
+    return getMockWeather(coords, districtId);
   }
 
   const url =
@@ -88,4 +89,14 @@ export const getWeatherForecast = async (districtId = 'lahore') => {
   });
 
   return { days, districtNameUr: coords.nameUr };
+};
+
+const getMockWeather = (coords, districtId) => {
+  const DAY_NAMES_UR = ['آج', 'کل', 'پرسوں'];
+  const days = [
+    { date: '2026-04-27', dayUr: DAY_NAMES_UR[0], tempMax: 36, rainChance: 10, descUr: 'صاف آسمان', emoji: '☀️', willRain: false },
+    { date: '2026-04-28', dayUr: DAY_NAMES_UR[1], tempMax: 34, rainChance: 20, descUr: 'تھوڑے بادل', emoji: '🌤️', willRain: false },
+    { date: '2026-04-29', dayUr: DAY_NAMES_UR[2], tempMax: 30, rainChance: 60, descUr: 'ہلکی بارش', emoji: '🌧️', willRain: true },
+  ];
+  return { days, districtNameUr: coords.nameUr, isMock: true };
 };

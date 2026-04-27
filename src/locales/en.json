@@ -18,7 +18,9 @@
     "camera": "Camera",
     "gallery": "Gallery",
     "logout": "Logout",
-    "or": "OR"
+    "or": "OR",
+    "seeAllArrow": "See All →",
+    "notAvailable": "N/A"
   },
   "navigation": {
     "home": "Home",
@@ -105,7 +107,9 @@
     "forgotPasswordTitle": "Forgot Password?",
     "forgotPasswordSubtitle": "Enter your email address and we'll send you instructions to reset your password.",
     "sendResetLink": "Send Reset Link",
-    "resetEmailSent": "Password reset email sent! Please check your inbox."
+    "resetEmailSent": "Password reset email sent! Please check your inbox.",
+    "checkEmailTitle": "Check your email!",
+    "checkEmailBody": "We sent a confirmation link to {{email}}. Please confirm your email then sign in."
   },
   "home": {
     "title": "Dashboard",
@@ -116,7 +120,10 @@
     "soilAdvisory": "Soil Advisory",
     "viewMap": "View Map",
     "recentActivity": "Recent Activity",
-    "noActivity": "No recent activity"
+    "noActivity": "No recent activity",
+    "activityDisease": "Disease Detection",
+    "activityYield": "Yield Prediction",
+    "defaultFarmerName": "Farmer"
   },
   "disease": {
     "title": "Disease Detection",
@@ -135,7 +142,8 @@
     "history": "Detection History",
     "noHistory": "No detection history yet",
     "scanAnother": "Scan Another",
-    "selectCropFirst": "Please select a crop first"
+    "selectCropFirst": "Please select a crop first",
+    "selectImageFirst": "Please select an image first"
   },
   "yield": {
     "title": "Yield Prediction",
@@ -204,7 +212,12 @@
     "about": "About",
     "version": "Version",
     "updateProfile": "Update Profile",
-    "profileUpdated": "Profile updated successfully"
+    "profileUpdated": "Profile updated successfully",
+    "logoutConfirm": "Do you really want to log out?",
+    "guestName": "Guest",
+    "acresUnit": "acres",
+    "onLabel": "On",
+    "other": "Other"
   },
   "admin": {
     "title": "Admin Panel",
@@ -215,7 +228,14 @@
     "totalDetections": "Total Detections",
     "totalPredictions": "Total Predictions",
     "manageCrops": "Manage Crops",
-    "manageContent": "Manage Content"
+    "manageContent": "Manage Content",
+    "activeUsers": "Active Users",
+    "diseaseDistribution": "Disease Distribution",
+    "joinedLabel": "Joined",
+    "loginTitle": "Admin Login",
+    "username": "Username",
+    "loginSuccess": "Admin login successful",
+    "invalidCredentials": "Invalid credentials"
   },
   "errors": {
     "networkError": "Network error. Please check your connection.",

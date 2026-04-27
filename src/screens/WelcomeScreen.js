@@ -9,14 +9,15 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { COLORS } from '../utils/constants';
+import BrandLogo from '../components/BrandLogo';
 import Button from '../components/Button';
 
 const WelcomeScreen = ({ navigation }) => {
-  const { login } = useAuth();
+  const { loginAsGuest } = useAuth();
   const { t } = useLanguage();
 
   const handleGuestMode = () => {
-    login({ isGuest: true }, null);
+    loginAsGuest();
     navigation.replace('MainApp');
   };
 
@@ -25,7 +26,7 @@ const WelcomeScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.logo}>🌾</Text>
+          <BrandLogo variant="full" size="hero" style={{ marginBottom: 16 }} />
           <Text style={styles.title}>{t('common.appName')}</Text>
           <Text style={styles.subtitle}>{t('auth.welcomeMessage')}</Text>
         </View>
@@ -65,22 +66,22 @@ const WelcomeScreen = ({ navigation }) => {
 
         {/* Features List */}
         <View style={styles.features}>
-          <Text style={styles.featuresTitle}>Features:</Text>
+          <Text style={styles.featuresTitle}>{t('home.quickActions')}</Text>
           <View style={styles.feature}>
             <Text style={styles.featureIcon}>🔍</Text>
-            <Text style={styles.featureText}>AI-powered disease detection</Text>
+            <Text style={styles.featureText}>{t('home.detectDisease')}</Text>
           </View>
           <View style={styles.feature}>
             <Text style={styles.featureIcon}>📊</Text>
-            <Text style={styles.featureText}>Accurate yield predictions</Text>
+            <Text style={styles.featureText}>{t('home.predictYield')}</Text>
           </View>
           <View style={styles.feature}>
             <Text style={styles.featureIcon}>🌱</Text>
-            <Text style={styles.featureText}>Personalized farming advice</Text>
+            <Text style={styles.featureText}>{t('home.soilAdvisory')}</Text>
           </View>
           <View style={styles.feature}>
             <Text style={styles.featureIcon}>🗺️</Text>
-            <Text style={styles.featureText}>GeoSpatial mapping</Text>
+            <Text style={styles.featureText}>{t('home.viewMap')}</Text>
           </View>
         </View>
       </ScrollView>
@@ -101,10 +102,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 60,
     marginBottom: 48,
-  },
-  logo: {
-    fontSize: 80,
-    marginBottom: 16,
   },
   title: {
     fontSize: 32,

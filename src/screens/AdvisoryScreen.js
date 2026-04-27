@@ -24,14 +24,14 @@ const DISTRICT_LIST = Object.entries(DISTRICT_COORDS).map(([id, v]) => ({
 
 // ─── Tab Bar ────────────────────────────────────────────────────────────────
 
-const TabBar = ({ activeTab, onTabChange }) => (
+const TabBar = ({ activeTab, onTabChange, currentLanguage }) => (
   <View style={styles.tabBar}>
     <TouchableOpacity
       style={[styles.tab, activeTab === 'mashwara' && styles.tabActive]}
       onPress={() => onTabChange('mashwara')}
     >
       <Text style={[styles.tabText, activeTab === 'mashwara' && styles.tabTextActive]}>
-        {'\ud83d\udcac'} مشورہ لیں
+        {currentLanguage === 'ur' ? '\ud83d\udcac مشورہ لیں' : '💬 Advisory'}
       </Text>
     </TouchableOpacity>
     <TouchableOpacity
@@ -39,7 +39,7 @@ const TabBar = ({ activeTab, onTabChange }) => (
       onPress={() => onTabChange('plan')}
     >
       <Text style={[styles.tabText, activeTab === 'plan' && styles.tabTextActive]}>
-        {'\ud83d\udcc5'} فصل کا پلان
+        {currentLanguage === 'ur' ? '\ud83d\udcc5 فصل کا پلان' : '📅 Crop Plan'}
       </Text>
     </TouchableOpacity>
   </View>
@@ -208,6 +208,8 @@ const AdvisoryScreen = () => {
     return item ? (currentLanguage === 'ur' ? item.nameUr : item.nameEn) : '';
   };
 
+  const L = currentLanguage === 'en';
+
   const handleFetchWeather = async (districtId) => {
     try {
       setWeatherLoading(true);
@@ -222,25 +224,25 @@ const AdvisoryScreen = () => {
 
   const handleGetAdvisory = async () => {
     if (!cropType) {
-      Alert.alert('خرابی', 'براہ کرم فصل منتخب کریں');
+      Alert.alert(L ? 'Error' : 'خرابی', L ? 'Please select a crop' : 'براہ کرم فصل منتخب کریں');
       return;
     }
     if (!soilColor) {
-      Alert.alert('خرابی', 'براہ کرم مٹی کا رنگ منتخب کریں');
+      Alert.alert(L ? 'Error' : 'خرابی', L ? 'Please select soil color' : 'براہ کرم مٹی کا رنگ منتخب کریں');
       return;
     }
     try {
       setAdvisoryLoading(true);
       const result = getSmartAdvisory(cropType, soilColor);
       if (!result) {
-        Alert.alert('خرابی', 'اس فصل کے لیے مشورہ دستیاب نہیں');
+        Alert.alert(L ? 'Error' : 'خرابی', L ? 'Advisory not available for this crop' : 'اس فصل کے لیے مشورہ دستیاب نہیں');
         return;
       }
       const saved = (await getData('fert_checks_' + cropType)) || [];
       setCheckedFerts(saved);
       setAdvisory(result);
     } catch (err) {
-      Alert.alert('خرابی', 'مشورہ حاصل نہیں ہو سکا');
+      Alert.alert(L ? 'Error' : 'خرابی', L ? 'Could not get advisory' : 'مشورہ حاصل نہیں ہو سکا');
     } finally {
       setAdvisoryLoading(false);
     }
@@ -268,12 +270,12 @@ const AdvisoryScreen = () => {
 
   const handleGetPlan = () => {
     if (!planCrop) {
-      Alert.alert('خرابی', 'براہ کرم فصل منتخب کریں');
+      Alert.alert(L ? 'Error' : 'خرابی', L ? 'Please select a crop' : 'براہ کرم فصل منتخب کریں');
       return;
     }
     const calendar = getCropCalendar(planCrop);
     if (!calendar) {
-      Alert.alert('خرابی', 'اس فصل کا پلان دستیاب نہیں');
+      Alert.alert(L ? 'Error' : 'خرابی', L ? 'Plan not available for this crop' : 'اس فصل کا پلان دستیاب نہیں');
       return;
     }
     setCropCalendar(calendar);
@@ -285,31 +287,31 @@ const AdvisoryScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <TabBar activeTab={activeTab} onTabChange={setActiveTab} currentLanguage={currentLanguage} />
 
       {activeTab === 'mashwara' && (
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.screenTitle}>مشورہ لیں</Text>
+          <Text style={styles.screenTitle}>{L ? 'Get Advisory' : 'مشورہ لیں'}</Text>
 
           {!advisory ? (
             <Card>
               <PickerField
-                label="فصل منتخب کریں"
+                label={L ? 'Select Crop' : 'فصل منتخب کریں'}
                 value={getDisplayName(cropType, CROP_LIST)}
-                placeholder="فصل چنیں"
+                placeholder={L ? 'Choose crop' : 'فصل چنیں'}
                 onPress={() => setShowCropPicker(true)}
               />
               <PickerField
-                label="مٹی کا رنگ"
+                label={L ? 'Soil Color' : 'مٹی کا رنگ'}
                 value={getDisplayName(soilColor, SOIL_COLORS)}
-                placeholder="مٹی کا رنگ چنیں"
+                placeholder={L ? 'Choose soil color' : 'مٹی کا رنگ چنیں'}
                 onPress={() => setShowSoilPicker(true)}
                 colorDot={soilColor ? SOIL_COLORS.find((s) => s.id === soilColor)?.color : null}
               />
               <PickerField
-                label="ضلع"
+                label={L ? 'District' : 'ضلع'}
                 value={getDisplayName(district, DISTRICT_LIST)}
-                placeholder="ضلع چنیں"
+                placeholder={L ? 'Choose district' : 'ضلع چنیں'}
                 onPress={() => setShowDistrictPicker(true)}
               />
               <TouchableOpacity
@@ -321,7 +323,7 @@ const AdvisoryScreen = () => {
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
                   <Text style={styles.weatherBtnText}>
-                    {weather ? 'موسم تازہ کریں' : 'موسم چیک کریں (اختیاری)'}
+                    {weather ? (L ? 'Refresh Weather' : 'موسم تازہ کریں') : (L ? 'Check Weather (optional)' : 'موسم چیک کریں (اختیاری)')}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -342,7 +344,7 @@ const AdvisoryScreen = () => {
                 {advisoryLoading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.primaryBtnText}>سفارشات حاصل کریں</Text>
+                  <Text style={styles.primaryBtnText}>{L ? 'Get Recommendations' : 'سفارشات حاصل کریں'}</Text>
                 )}
               </TouchableOpacity>
             </Card>
@@ -357,7 +359,7 @@ const AdvisoryScreen = () => {
               )}
 
               <Card>
-                <Text style={styles.cardTitle}>آبپاشی</Text>
+                <Text style={styles.cardTitle}>{L ? 'Irrigation' : 'آبپاشی'}</Text>
                 {skipIrrigation && (
                   <View style={styles.skipWaterBanner}>
                     <Text style={styles.skipWaterText}>
@@ -372,28 +374,28 @@ const AdvisoryScreen = () => {
                 {!skipIrrigation && (
                   <View style={styles.safeWaterBanner}>
                     <Text style={styles.safeWaterText}>
-                      ✅ اگلے 2 دن بارش نہیں — معمول کے مطابق پانی دیں
+                      {L ? '✅ No rain in next 2 days — water as usual' : '✅ اگلے 2 دن بارش نہیں — معمول کے مطابق پانی دیں'}
                     </Text>
                   </View>
                 )}
                 <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>وقفہ:</Text>
+                  <Text style={styles.infoLabel}>{L ? 'Interval:' : 'وقفہ:'}</Text>
                   <Text style={styles.infoValue}>{advisory.waterSchedule.daysUr}</Text>
                 </View>
                 <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>مقدار:</Text>
+                  <Text style={styles.infoLabel}>{L ? 'Amount:' : 'مقدار:'}</Text>
                   <Text style={styles.infoValue}>{advisory.waterSchedule.amountUr}</Text>
                 </View>
                 <View style={styles.tipsBox}>
-                  <Text style={styles.tipItem}>{'\u2022'} صبح سویرے یا شام کو پانی دیں</Text>
-                  <Text style={styles.tipItem}>{'\u2022'} پانی کھڑا نہ ہونے دیں</Text>
-                  <Text style={styles.tipItem}>{'\u2022'} بارش کے بعد پانی نہ دیں</Text>
+                  <Text style={styles.tipItem}>{'\u2022'} {L ? 'Water in the morning or evening' : 'صبح سویرے یا شام کو پانی دیں'}</Text>
+                  <Text style={styles.tipItem}>{'\u2022'} {L ? 'Do not let water stagnate' : 'پانی کھڑا نہ ہونے دیں'}</Text>
+                  <Text style={styles.tipItem}>{'\u2022'} {L ? 'Do not water after rain' : 'بارش کے بعد پانی نہ دیں'}</Text>
                 </View>
               </Card>
 
               <Card>
-                <Text style={styles.cardTitle}>کھاد کا شیڈول</Text>
-                <Text style={styles.fertSubtitle}>جب کھاد ڈال دیں تو نشان لگائیں</Text>
+                <Text style={styles.cardTitle}>{L ? 'Fertilizer Schedule' : 'کھاد کا شیڈول'}</Text>
+                <Text style={styles.fertSubtitle}>{L ? 'Check off when applied' : 'جب کھاد ڈال دیں تو نشان لگائیں'}</Text>
                 <FertilizerChecklist
                   schedule={advisory.fertilizerSchedule}
                   checkedIds={checkedFerts}
@@ -402,17 +404,17 @@ const AdvisoryScreen = () => {
               </Card>
 
               <Card>
-                <Text style={styles.cardTitle}>عمومی ہدایات</Text>
+                <Text style={styles.cardTitle}>{L ? 'General Guidelines' : 'عمومی ہدایات'}</Text>
                 <View style={styles.tipsBox}>
-                  <Text style={styles.tipItem}>{'\u2022'} کھاد ہمیشہ پانی دینے کے بعد ڈالیں</Text>
-                  <Text style={styles.tipItem}>{'\u2022'} کھاد ڈالتے وقت دستانے پہنیں</Text>
-                  <Text style={styles.tipItem}>{'\u2022'} کھیت میں کیڑوں کا روزانہ معائنہ کریں</Text>
-                  <Text style={styles.tipItem}>{'\u2022'} متاثرہ پودے فوری الگ کریں</Text>
+                  <Text style={styles.tipItem}>{'•'} {L ? 'Always apply fertilizer after watering' : 'کھاد ہمیشہ پانی دینے کے بعد ڈالیں'}</Text>
+                  <Text style={styles.tipItem}>{'•'} {L ? 'Wear gloves when applying fertilizer' : 'کھاد ڈالتے وقت دستانے پہنیں'}</Text>
+                  <Text style={styles.tipItem}>{'•'} {L ? 'Inspect crops for pests daily' : 'کھیت میں کیڑوں کا روزانہ معائنہ کریں'}</Text>
+                  <Text style={styles.tipItem}>{'•'} {L ? 'Isolate affected plants immediately' : 'متاثرہ پودے فوری الگ کریں'}</Text>
                 </View>
               </Card>
 
               <TouchableOpacity style={styles.resetBtn} onPress={handleResetAdvisory}>
-                <Text style={styles.resetBtnText}>نئی سفارش لیں</Text>
+                <Text style={styles.resetBtnText}>{L ? 'New Recommendation' : 'نئی سفارش لیں'}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -421,18 +423,18 @@ const AdvisoryScreen = () => {
 
       {activeTab === 'plan' && (
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.screenTitle}>فصل کا پلان</Text>
+          <Text style={styles.screenTitle}>{L ? 'Crop Plan' : 'فصل کا پلان'}</Text>
 
           {!cropCalendar ? (
             <Card>
               <PickerField
-                label="فصل منتخب کریں"
+                label={L ? 'Select Crop' : 'فصل منتخب کریں'}
                 value={getDisplayName(planCrop, CROP_LIST)}
-                placeholder="فصل چنیں"
+                placeholder={L ? 'Choose crop' : 'فصل چنیں'}
                 onPress={() => setShowPlanCropPicker(true)}
               />
               <TouchableOpacity style={styles.primaryBtn} onPress={handleGetPlan}>
-                <Text style={styles.primaryBtnText}>مکمل پلان دیکھیں</Text>
+                <Text style={styles.primaryBtnText}>{L ? 'View Full Plan' : 'مکمل پلان دیکھیں'}</Text>
               </TouchableOpacity>
             </Card>
           ) : (
@@ -443,15 +445,15 @@ const AdvisoryScreen = () => {
                 </Text>
                 <View style={styles.calendarMeta}>
                   <Text style={styles.calendarMetaItem}>
-                    بوائی: {cropCalendar.sowingMonthsUr}
+                    {L ? 'Sowing: ' : 'بوائی: '}{cropCalendar.sowingMonthsUr}
                   </Text>
                   <Text style={styles.calendarMetaItem}>
-                    مدت: {cropCalendar.totalWeeks} ہفتے
+                    {L ? `Duration: ${cropCalendar.totalWeeks} weeks` : `مدت: ${cropCalendar.totalWeeks} ہفتے`}
                   </Text>
                 </View>
               </View>
 
-              <Text style={styles.planHint}>کسی بھی ہفتے پر دبائیں تفصیل دیکھنے کے لیے</Text>
+              <Text style={styles.planHint}>{L ? 'Tap any week to expand details' : 'کسی بھی ہفتے پر دبائیں تفصیل دیکھنے کے لیے'}</Text>
 
               {cropCalendar.weeks.map((week, i) => (
                 <WeekCard key={i} week={week} />
@@ -461,7 +463,7 @@ const AdvisoryScreen = () => {
                 style={styles.resetBtn}
                 onPress={() => { setCropCalendar(null); setPlanCrop(''); }}
               >
-                <Text style={styles.resetBtnText}>دوسری فصل کا پلان</Text>
+                <Text style={styles.resetBtnText}>{L ? 'Plan Another Crop' : 'دوسری فصل کا پلان'}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -471,7 +473,7 @@ const AdvisoryScreen = () => {
       <Picker
         visible={showCropPicker}
         onClose={() => setShowCropPicker(false)}
-        title="فصل منتخب کریں"
+        title={L ? 'Select Crop' : 'فصل منتخب کریں'}
         items={CROP_LIST}
         selectedValue={cropType}
         onValueChange={(v) => { setCropType(v); setAdvisory(null); }}
@@ -480,7 +482,7 @@ const AdvisoryScreen = () => {
       <Picker
         visible={showSoilPicker}
         onClose={() => setShowSoilPicker(false)}
-        title="مٹی کا رنگ منتخب کریں"
+        title={L ? 'Select Soil Color' : 'مٹی کا رنگ منتخب کریں'}
         items={SOIL_COLORS}
         selectedValue={soilColor}
         onValueChange={(v) => { setSoilColor(v); setAdvisory(null); }}
@@ -947,6 +949,14 @@ const styles = StyleSheet.create({
   },
   weekFertHighlight: {
     color: '#2E7D32',
+  },
+  englishAlign: {
+    textAlign: 'left',
+  },
+  englishBody: {
+    fontSize: 15,
+    color: COLORS.text,
+    lineHeight: 24,
   },
 });
 

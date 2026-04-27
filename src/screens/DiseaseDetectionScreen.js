@@ -15,6 +15,7 @@ import { COLORS, CROP_LIST } from '../utils/constants';
 import { detectDisease } from '../services/diseaseService';
 import { releaseModel } from '../services/tfliteService';
 import diseaseSprayData from '../data/diseaseSprayData.json';
+import { RECOMMENDATIONS_EN } from '../config/modelConfig';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import CropSelector from '../components/CropSelector';
@@ -23,7 +24,8 @@ import Loader from '../components/Loader';
 
 const DiseaseDetectionScreen = ({ navigation }) => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, currentLanguage } = useLanguage();
+  const L = currentLanguage === 'en';
   const [selectedCrop, setSelectedCrop] = useState(null);
   const [imageUri, setImageUri] = useState(null);
   const [detecting, setDetecting] = useState(false);
@@ -95,7 +97,7 @@ const DiseaseDetectionScreen = ({ navigation }) => {
 
   const handleDetect = async () => {
     if (!imageUri) {
-      Alert.alert(t('common.error'), 'براہ کرم پہلے تصویر منتخب کریں');
+      Alert.alert(t('common.error'), t('disease.selectImageFirst'));
       return;
     }
 
@@ -138,7 +140,7 @@ const DiseaseDetectionScreen = ({ navigation }) => {
             
             <View style={styles.diseaseInfo}>
               <Text style={styles.diseaseLabel}>{t('disease.diseaseName')}:</Text>
-              <Text style={styles.diseaseName}>{result.result.diseaseNameUrdu}</Text>
+              <Text style={styles.diseaseName}>{L ? (result.result.diseaseName || result.result.diseaseNameUrdu) : result.result.diseaseNameUrdu}</Text>
             </View>
 
             <View style={styles.confidenceBar}>
@@ -160,7 +162,7 @@ const DiseaseDetectionScreen = ({ navigation }) => {
               <Text style={styles.recommendationsTitle}>
                 {t('disease.recommendations')}:
               </Text>
-              {result.result.recommendations.map((rec, index) => (
+              {(L ? (RECOMMENDATIONS_EN[result.result.status] || result.result.recommendations) : result.result.recommendations).map((rec, index) => (
                 <View key={index} style={styles.recommendationItem}>
                   <Text style={styles.recommendationBullet}>•</Text>
                   <Text style={styles.recommendationText}>{rec}</Text>
@@ -175,23 +177,23 @@ const DiseaseDetectionScreen = ({ navigation }) => {
           if (!sprayInfo) return null;
           const isNoSpray = sprayInfo.amountPerAcreUr === '—';
           return (
-            <Card title="علاج">
+            <Card title={L ? 'Treatment' : 'علاج'}>
               <View style={styles.sprayRow}>
-                <Text style={styles.sprayLabel}>دوائی:</Text>
-                <Text style={styles.sprayValue}>{sprayInfo.sprayNameUr}</Text>
+                <Text style={styles.sprayLabel}>{L ? 'Medicine:' : 'دوائی:'}</Text>
+                <Text style={styles.sprayValue}>{L ? (sprayInfo.sprayNameEn || sprayInfo.sprayNameUr) : sprayInfo.sprayNameUr}</Text>
               </View>
               {!isNoSpray && (
                 <View style={styles.sprayRow}>
-                  <Text style={styles.sprayLabel}>مقدار:</Text>
+                  <Text style={styles.sprayLabel}>{L ? 'Amount:' : 'مقدار:'}</Text>
                   <Text style={styles.sprayValue}>{sprayInfo.amountPerAcreUr}</Text>
                 </View>
               )}
               <View style={styles.sprayRow}>
-                <Text style={styles.sprayLabel}>وقت:</Text>
+                <Text style={styles.sprayLabel}>{L ? 'Timing:' : 'وقت:'}</Text>
                 <Text style={styles.sprayValue}>{sprayInfo.timingUr}</Text>
               </View>
               <View style={styles.sprayRow}>
-                <Text style={styles.sprayLabel}>تعدد:</Text>
+                <Text style={styles.sprayLabel}>{L ? 'Frequency:' : 'تعدد:'}</Text>
                 <Text style={styles.sprayValue}>{sprayInfo.frequencyUr}</Text>
               </View>
               <View style={styles.sprayCaution}>

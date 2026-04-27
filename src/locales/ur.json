@@ -18,7 +18,9 @@
     "camera": "کیمرہ",
     "gallery": "گیلری",
     "logout": "لاگ آؤٹ",
-    "or": "یا"
+    "or": "یا",
+    "seeAllArrow": "سب دیکھیں →",
+    "notAvailable": "دستیاب نہیں"
   },
   "navigation": {
     "home": "ہوم",
@@ -105,7 +107,9 @@
     "forgotPasswordTitle": "پاس ورڈ بھول گئے؟",
     "forgotPasswordSubtitle": "اپنا ای میل ایڈریس درج کریں اور ہم آپ کو پاس ورڈ دوبارہ ترتیب دینے کی ہدایات بھیجیں گے۔",
     "sendResetLink": "ری سیٹ لنک بھیجیں",
-    "resetEmailSent": "پاس ورڈ ری سیٹ ای میل بھیج دی گئی ہے! براہ کرم اپنا ان باکس چیک کریں۔"
+    "resetEmailSent": "پاس ورڈ ری سیٹ ای میل بھیج دی گئی ہے! براہ کرم اپنا ان باکس چیک کریں۔",
+    "checkEmailTitle": "اپنا ای میل چیک کریں!",
+    "checkEmailBody": "ہم نے {{email}} پر تصدیقی لنک بھیجا ہے۔ براہ کرم ای میل تصدیق کریں پھر لاگ ان کریں۔"
   },
   "home": {
     "title": "ڈیش بورڈ",
@@ -116,7 +120,10 @@
     "soilAdvisory": "مٹی کا مشورہ",
     "viewMap": "نقشہ دیکھیں",
     "recentActivity": "حالیہ سرگرمی",
-    "noActivity": "کوئی حالیہ سرگرمی نہیں"
+    "noActivity": "کوئی حالیہ سرگرمی نہیں",
+    "activityDisease": "بیماری کی تشخیص",
+    "activityYield": "پیداوار کی پیشن گوئی",
+    "defaultFarmerName": "کسان"
   },
   "disease": {
     "title": "بیماری کی تشخیص",
@@ -135,7 +142,8 @@
     "history": "تشخیص کی تاریخ",
     "noHistory": "ابھی تک تشخیص کی کوئی تاریخ نہیں",
     "scanAnother": "دوسری اسکین کریں",
-    "selectCropFirst": "براہ کرم پہلے فصل منتخب کریں"
+    "selectCropFirst": "براہ کرم پہلے فصل منتخب کریں",
+    "selectImageFirst": "براہ کرم پہلے تصویر منتخب کریں"
   },
   "yield": {
     "title": "پیداوار کی پیشن گوئی",
@@ -204,7 +212,12 @@
     "about": "کے بارے میں",
     "version": "ورژن",
     "updateProfile": "پروفائل اپ ڈیٹ کریں",
-    "profileUpdated": "پروفائل کامیابی سے اپ ڈیٹ ہو گئی"
+    "profileUpdated": "پروفائل کامیابی سے اپ ڈیٹ ہو گئی",
+    "logoutConfirm": "کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟",
+    "guestName": "مہمان",
+    "acresUnit": "ایکڑ",
+    "onLabel": "آن",
+    "other": "دیگر"
   },
   "admin": {
     "title": "ایڈمن پینل",
@@ -215,7 +228,14 @@
     "totalDetections": "کل تشخیصات",
     "totalPredictions": "کل پیشن گوئیاں",
     "manageCrops": "فصلوں کا انتظام",
-    "manageContent": "مواد کا انتظام"
+    "manageContent": "مواد کا انتظام",
+    "activeUsers": "فعال صارفین",
+    "diseaseDistribution": "بیماری کی تقسیم",
+    "joinedLabel": "شامل ہوئے",
+    "loginTitle": "ایڈمن لاگ ان",
+    "username": "صارف نام",
+    "loginSuccess": "ایڈمن لاگ ان کامیاب",
+    "invalidCredentials": "غلط اسناد"
   },
   "errors": {
     "networkError": "نیٹ ورک کی خرابی۔ براہ کرم اپنا کنکشن چیک کریں۔",
