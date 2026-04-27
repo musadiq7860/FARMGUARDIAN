@@ -202,9 +202,9 @@ Abdullah Arshad @AbdullahArshad21
 ## 📞 Support
 
 For issues or questions, contact the development team.
-BY ABDULLAH ARSHAD
-   FARAZ SHOUKAT
-   MUSADIQ QAYSER
+ ABDULLAH ARSHAD @AbdullahArshad21
+ FARAZ SHOUKAT @farazshoukat
+ MUSADIQ QAYSER @farazshoukat
   
 ---
 
