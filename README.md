@@ -14,8 +14,8 @@ FarmGuardian is a mobile application designed to help farmers with:
 ## 🚀 Features
 
 ### Core Modules
-1. **Authentication**
-   - Phone number + OTP login
+1. **Authentication** 
+   - Email
    - Guest mode for first-time users
    - Simple registration process
 
