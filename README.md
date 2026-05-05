@@ -205,7 +205,7 @@ Abdullah Arshad @AbdullahArshad21
 For issues or questions, contact the development team.
  ABDULLAH ARSHAD @AbdullahArshad21
  FARAZ SHOUKAT @farazshoukat
- MUSADIQ QAYSER @farazshoukat
+ MUSADIQ QAYSER @MuhammadMusaddaq7860
   
 ---
 
