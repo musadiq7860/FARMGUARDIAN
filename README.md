@@ -1,4 +1,4 @@
- n  # FarmGuardian - React Native Mobile App
+ # FarmGuardian - React Native Mobile App
 
 A comprehensive AI-powered agricultural decision support system for farmers in Punjab, Pakistan.
 
