@@ -39,7 +39,7 @@ const AdminScreen = ({ navigation }) => {
         getAdminStats(),
         getFarmers(),
       ]);
-      setStats(statsData);
+      setStats(statsData);  
       setFarmers(farmersData);
     } catch (error) {
       console.error('Error loading admin data:', error);
