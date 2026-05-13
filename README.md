@@ -3,8 +3,8 @@
 A comprehensive AI-powered agricultural decision support system for farmers in Punjab, Pakistan.
 
 ## 🌾 Overview
-
-FarmGuardian is a mobile application designed to help farmers with:
+ 
+FarmGuardian is a mobile application designed to help farmers with
 - **Disease Detection**: Upload crop leaf images for AI-based disease identification
 - **Yield Prediction**: Predict crop yields based on soil, weather, and farming practices
 - **Soil & Resource Advisory**: Get irrigation and fertilizer recommendations
