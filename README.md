@@ -1,6 +1,6 @@
 # FarmGuardian - React Native Mobile App
 
-A comprehensive AI-powered agricultural decision support system for farmers in Punjab, Pakistan.
+A comprehensive AI-powered agricultural decision support system for farmers in Punjab, Pakistan...
 
 ## 🌾 Overview
  
