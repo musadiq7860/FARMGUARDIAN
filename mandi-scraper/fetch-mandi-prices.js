@@ -18,11 +18,11 @@ const CITY_MAP = {
 };
 
 const CROPS = {
-  wheat:  { id: 1,  en: 'Wheat',                    ur: 'گندم' },
-  rice:   { id: 3,  en: 'Rice (Basmati)',            ur: 'باسمتی چاول' },
-  maize:  { id: 17, en: 'Maize',                    ur: 'مکئی' },
-  potato: { id: 22, en: 'Potato',                   ur: 'آلو' },
-  tomato: { id: 26, en: 'Tomato',                   ur: 'ٹماٹر' }
+  wheat:  { id: 1,  en: 'Wheat',           ur: 'گندم' },
+  rice:   { id: 3,  en: 'Rice (Basmati)',  ur: 'باسمتی چاول' },
+  maize:  { id: 17, en: 'Maize',           ur: 'مکئی' },
+  potato: { id: 22, en: 'Potato',          ur: 'آلو' },
+  tomato: { id: 26, en: 'Tomato',          ur: 'ٹماٹر' }
 };
 
 const SANITY_MIN = 500;
@@ -32,7 +32,8 @@ function parseNum(s) {
   if (!s) return null;
   const t = s.trim();
   if (t === '-' || t === '') return null;
-  return Number(t.replace(/,/g, ''));
+  const n = Number(t.replace(/,/g, ''));
+  return Number.isNaN(n) ? null : n; // NaN ko bhi null treat karo
 }
 
 async function scrapeCrop(cropId) {
@@ -58,11 +59,11 @@ async function scrapeCrop(cropId) {
     const fqp = parseNum($(cells[4]).text());
 
     const raw100kg = fqp ?? ((min != null && max != null) ? Math.round((min + max) / 2) : null);
-    if (raw100kg == null) return; // "-" wala data, skip
+    if (raw100kg == null || Number.isNaN(raw100kg)) return; // "-" ya invalid data, skip
 
     const price40kg = Math.round(raw100kg * 0.4); // Rs/100kg -> Rs/40kg
 
-    if (price40kg < SANITY_MIN || price40kg > SANITY_MAX) {
+    if (price40kg < SANITY_MIN || price40kg > SANITY_MAX || Number.isNaN(price40kg)) {
       console.warn(`Skipping suspicious price: ${cityName} = ${price40kg}`);
       return;
     }
