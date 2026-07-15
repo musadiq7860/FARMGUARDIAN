@@ -3,57 +3,73 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-const CITIES = {
-  Lahore:      { id: 1,  ur: 'لاہور' },
-  Faisalabad:  { id: 2,  ur: 'فیصل آباد' },
-  Gujranwala:  { id: 3,  ur: 'گوجرانوالہ' },
-  Sargodha:    { id: 5,  ur: 'سرگودھا' },
-  Rawalpindi:  { id: 6,  ur: 'راولپنڈی' },
-  Multan:      { id: 7,  ur: 'ملتان' },
-  Bahawalpur:  { id: 20, ur: 'بہاولپور' },
-  Sahiwal:     { id: 13, ur: 'ساہیوال' },
-  Sialkot:     { id: 57, ur: 'سیالکوٹ' },
-  Sheikhupura: { id: 78, ur: 'شیخوپورہ' }
+// AMIS ka city label -> hamari DB ka city name + Urdu naam
+const CITY_MAP = {
+  'Lahore':      { db: 'Lahore',      ur: 'لاہور' },
+  'Faisalabad':  { db: 'Faisalabad',  ur: 'فیصل آباد' },
+  'Gujranwala':  { db: 'Gujranwala',  ur: 'گوجرانوالہ' },
+  'Sargodha':    { db: 'Sargodha',    ur: 'سرگودھا' },
+  'Rawalpindi':  { db: 'Rawalpindi',  ur: 'راولپنڈی' },
+  'Multan':      { db: 'Multan',      ur: 'ملتان' },
+  'BahawalPur':  { db: 'Bahawalpur',  ur: 'بہاولپور' },
+  'Sahiwal':     { db: 'Sahiwal',     ur: 'ساہیوال' },
+  'Sialkot':     { db: 'Sialkot',     ur: 'سیالکوٹ' },
+  'Sheikhupura': { db: 'Sheikhupura', ur: 'شیخوپورہ' }
 };
 
 const CROPS = {
-  wheat:  { id: 1,  en: 'Wheat',          ur: 'گندم' },
-  rice:   { id: 3,  en: 'Rice (Basmati)', ur: 'باسمتی چاول' },
-  maize:  { id: 17, en: 'Maize',          ur: 'مکئی' },
-  potato: { id: 21, en: 'Potato',         ur: 'آلو' },
-  tomato: { id: 26, en: 'Tomato',         ur: 'ٹماٹر' }
+  wheat:  { id: 1,  en: 'Wheat',                    ur: 'گندم' },
+  rice:   { id: 3,  en: 'Rice (Basmati)',            ur: 'باسمتی چاول' },
+  maize:  { id: 17, en: 'Maize',                    ur: 'مکئی' },
+  potato: { id: 22, en: 'Potato',                   ur: 'آلو' },
+  tomato: { id: 26, en: 'Tomato',                   ur: 'ٹماٹر' }
 };
 
-// sanity range for a converted 40kg price — agar isse bahar aaye to skip/flag karo
 const SANITY_MIN = 500;
 const SANITY_MAX = 100000;
 
-async function scrapeCity(cityId) {
-  const url = `http://www.amis.pk/ViewPrices.aspx?searchType=1&commodityId=${cityId}`;
+function parseNum(s) {
+  if (!s) return null;
+  const t = s.trim();
+  if (t === '-' || t === '') return null;
+  return Number(t.replace(/,/g, ''));
+}
+
+async function scrapeCrop(cropId) {
+  const url = `http://www.amis.pk/ViewPrices.aspx?searchType=0&commodityId=${cropId}`;
   const res = await fetch(url);
   const html = await res.text();
   const $ = cheerio.load(html);
-  const lines = $('body').text().split('\n').map(l => l.trim()).filter(Boolean);
 
-  const results = {};
-  for (const [cropId, crop] of Object.entries(CROPS)) {
-    const match = lines.find(l => l.includes(`commodityId=${crop.id}&`) && l.includes('Graph'));
-    if (!match) continue;
-    const numbers = (match.match(/-?\d[\d,]*/g) || []).map(n => n === '-' ? null : Number(n.replace(/,/g, '')));
-    const [min, max, avg] = numbers;
-    if (min == null && max == null) continue;
+  const results = {}; // AMIS city label -> price40kg
 
-    // AMIS gives Rs/100kg — convert to Rs/40kg
-    const raw100kg = avg ?? Math.round(((min ?? 0) + (max ?? 0)) / 2);
-    const price40kg = Math.round(raw100kg * 0.4);
+  $('tr').each((_, row) => {
+    const cells = $(row).find('td');
+    if (cells.length < 6) return;
+
+    const cityLink = $(cells[0]).find('a[href*="searchType=1"]');
+    if (cityLink.length === 0) return;
+
+    const cityName = cityLink.text().trim();
+    if (!(cityName in CITY_MAP)) return;
+
+    const min = parseNum($(cells[2]).text());
+    const max = parseNum($(cells[3]).text());
+    const fqp = parseNum($(cells[4]).text());
+
+    const raw100kg = fqp ?? ((min != null && max != null) ? Math.round((min + max) / 2) : null);
+    if (raw100kg == null) return; // "-" wala data, skip
+
+    const price40kg = Math.round(raw100kg * 0.4); // Rs/100kg -> Rs/40kg
 
     if (price40kg < SANITY_MIN || price40kg > SANITY_MAX) {
-      console.warn(`Skipping suspicious price: ${cropId} @ city ${cityId} = ${price40kg}`);
-      continue;
+      console.warn(`Skipping suspicious price: ${cityName} = ${price40kg}`);
+      return;
     }
 
-    results[cropId] = price40kg;
-  }
+    results[cityName] = price40kg;
+  });
+
   return results;
 }
 
@@ -66,13 +82,13 @@ async function main() {
   const prevMap = new Map(existing.map(r => [`${r.crop_id}|${r.district_en}`, r.price_per_40kg]));
   const rows = [];
 
-  for (const [cityName, city] of Object.entries(CITIES)) {
-    console.log(`Scraping ${cityName}...`);
-    const prices = await scrapeCity(city.id);
+  for (const [cropId, crop] of Object.entries(CROPS)) {
+    console.log(`Scraping ${crop.en}...`);
+    const prices = await scrapeCrop(crop.id);
 
-    for (const [cropId, newPrice] of Object.entries(prices)) {
-      const crop = CROPS[cropId];
-      const key = `${cropId}|${cityName}`;
+    for (const [amisCity, newPrice] of Object.entries(prices)) {
+      const city = CITY_MAP[amisCity];
+      const key = `${cropId}|${city.db}`;
       const oldPrice = prevMap.get(key);
       const changePercent = oldPrice ? Number((((newPrice - oldPrice) / oldPrice) * 100).toFixed(1)) : 0;
 
@@ -80,7 +96,7 @@ async function main() {
         crop_id: cropId,
         crop_name_en: crop.en,
         crop_name_ur: crop.ur,
-        district_en: cityName,
+        district_en: city.db,
         district_ur: city.ur,
         price_per_40kg: newPrice,
         change_percent: changePercent,
